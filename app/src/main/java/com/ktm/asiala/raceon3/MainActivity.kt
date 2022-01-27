@@ -2,29 +2,31 @@ package com.ktm.asiala.raceon3
 
 import android.Manifest
 import android.app.AlertDialog
+import android.bluetooth.*
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import org.altbeacon.beacon.Beacon
 import org.altbeacon.beacon.BeaconManager
-import org.altbeacon.beacon.MonitorNotifier
 import org.altbeacon.beaconreference.R
 
+
 class MainActivity : AppCompatActivity() {
-    lateinit var beaconListView: ListView
+    lateinit var beaconStateTextView: TextView
     lateinit var beaconCountTextView: TextView
-    lateinit var monitoringButton: Button
-    lateinit var rangingButton: Button
+    lateinit var button1: Button
+    lateinit var button2: Button
     lateinit var beaconReferenceApplication: BeaconReferenceApplication
     var alertDialog: AlertDialog? = null
+
+    lateinit var mBluetoothManager: BluetoothManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +39,13 @@ class MainActivity : AppCompatActivity() {
         regionViewModel.regionState.observe(this, monitoringObserver)
         // observer will be called each time a new list of beacons is ranged (typically ~1 second in the foreground)
         regionViewModel.rangedBeacons.observe(this, rangingObserver)
-        rangingButton = findViewById<Button>(R.id.rangingButton)
-        monitoringButton = findViewById<Button>(R.id.monitoringButton)
-        beaconListView = findViewById<ListView>(R.id.beaconList)
+
+        //Link views with variables
+        button1 = findViewById<Button>(R.id.button1)
+        button2 = findViewById<Button>(R.id.button1)
+        beaconStateTextView = findViewById<TextView>(R.id.beaconState)
         beaconCountTextView = findViewById<TextView>(R.id.beaconCount)
-        beaconCountTextView.text = "No beacons detected"
-        beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf("--"))
+        beaconCountTextView.text = "Searching..."
     }
 
     override fun onPause() {
@@ -55,8 +58,9 @@ class MainActivity : AppCompatActivity() {
         checkPermissions()
     }
 
+    //Not used right now
     val monitoringObserver = Observer<Int> { state ->
-        var dialogTitle = "Beacons detected"
+        /*var dialogTitle = "Beacons detected"
         var dialogMessage = "didEnterRegionEvent has fired"
         var stateString = "inside"
         if (state == MonitorNotifier.OUTSIDE) {
@@ -77,63 +81,44 @@ class MainActivity : AppCompatActivity() {
         builder.setPositiveButton(android.R.string.ok, null)
         alertDialog?.dismiss()
         alertDialog = builder.create()
-        alertDialog?.show()
+        alertDialog?.show()*/
     }
 
+    //Check if the right beacon is found
     val rangingObserver = Observer<Collection<Beacon>> { beacons ->
         Log.d(TAG, "Ranged: ${beacons.count()} beacons")
-        if (BeaconManager.getInstanceForApplication(this).rangedRegions.size > 0) {
-            beaconCountTextView.text = "Ranging enabled: ${beacons.count()} beacon(s) detected"
-            beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,
-                beacons
-                    .sortedBy { it.distance }
-                    .map { "${it.id1}\nid2: ${it.id2} id3:  rssi: ${it.rssi}\nest. distance: ${it.distance} m" }.toTypedArray())
+
+        //Check if the required beacon is found
+        if(beacons.size != 0){
+            beacons.forEach { beacon ->
+                if(beacon.bluetoothName.equals("RaceOn")){
+                    Log.d(TAG, "Found the right RaceOn Beacon")
+
+                    beaconCountTextView.setText("Found the motorcycle! " + beacon.bluetoothAddress)
+                    beaconStateTextView.setText("Connecting...")
+
+                    //Stop searching for more beacons
+                    val beaconManager = BeaconManager.getInstanceForApplication(this)
+                    beaconManager.stopMonitoring(beaconReferenceApplication.region);
+                    beaconManager.stopRangingBeacons(beaconReferenceApplication.region);
+
+                    //Connect to the device
+                    connectAndBondWithMotorcycle(beacon.bluetoothAddress);
+                }
+            }
         }
     }
 
-    fun rangingButtonTapped(view: View) {
-        val beaconManager = BeaconManager.getInstanceForApplication(this)
-        if (beaconManager.rangedRegions.size == 0) {
-            beaconManager.startRangingBeacons(beaconReferenceApplication.region)
-            rangingButton.text = "Stop Ranging"
-            beaconCountTextView.text = "Ranging enabled -- awaiting first callback"
-        }
-        else {
-            beaconManager.stopRangingBeacons(beaconReferenceApplication.region)
-            rangingButton.text = "Start Ranging"
-            beaconCountTextView.text = "Ranging disabled -- no beacons detected"
-            beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf("--"))
-        }
-    }
-
-    fun monitoringButtonTapped(view: View) {
-        var dialogTitle = ""
-        var dialogMessage = ""
-        val beaconManager = BeaconManager.getInstanceForApplication(this)
-        if (beaconManager.monitoredRegions.size == 0) {
-            beaconManager.startMonitoring(beaconReferenceApplication.region)
-            dialogTitle = "Beacon monitoring started."
-            dialogMessage = "You will see a dialog if a beacon is detected, and another if beacons then stop being detected."
-            monitoringButton.text = "Stop Monitoring"
-
-        }
-        else {
-            beaconManager.stopMonitoring(beaconReferenceApplication.region)
-            dialogTitle = "Beacon monitoring stopped."
-            dialogMessage = "You will no longer see dialogs when becaons start/stop being detected."
-            monitoringButton.text = "Start Monitoring"
-        }
-        val builder =
-            AlertDialog.Builder(this)
-        builder.setTitle(dialogTitle)
-        builder.setMessage(dialogMessage)
-        builder.setPositiveButton(android.R.string.ok, null)
-        alertDialog?.dismiss()
-        alertDialog = builder.create()
-        alertDialog?.show()
+    fun button1Tapped(view: View) {
 
     }
 
+    fun button2Tapped(view: View) {
+
+    }
+
+
+    //Permissions
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -145,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    //Permissions
     fun checkPermissions() {
         // basepermissions are for M and higher
         var permissions = arrayOf( Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
@@ -219,6 +204,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    //Create GATT Callback
+    private val bluetoothGattCallback = object : BluetoothGattCallback() {
+        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                Log.d(TAG, "Connected")
+                beaconStateTextView.setText("Connected! Bonded!")
+
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.d(TAG, "Disconnect")
+                beaconStateTextView.setText("Disconnected!")
+            }
+        }
+    }
+
+    //Connect / Bond the smartphone with the motorcycle (over the mac address)
+    fun connectAndBondWithMotorcycle(macAdress: String){
+        mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
+        val mBluetoothAdapter = mBluetoothManager.getAdapter();
+        val device: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(macAdress)
+        device.connectGatt(this, false, bluetoothGattCallback)
+        device.createBond();
+    }
+
+
 
     companion object {
         val TAG = "MainActivity"

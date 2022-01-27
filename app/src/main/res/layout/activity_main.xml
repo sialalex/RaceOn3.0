@@ -13,29 +13,29 @@
         android:textAlignment="center"
         android:layout_width="match_parent"
         android:layout_height="20dp"/>
-    <ListView
-        android:id="@+id/beaconList"
+    <TextView
+        android:id="@+id/beaconState"
+        android:text="Unknown"
+        android:textAlignment="center"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-    </ListView>
+        android:layout_height="20dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_weight="0">
         <Button
-            android:id="@+id/rangingButton"
-            android:onClick="rangingButtonTapped"
-            android:text="Disable Ranging"
+            android:id="@+id/button1"
+            android:onClick="button1Tapped"
+            android:text="Button 1"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1">
         </Button>
         <Button
-            android:id="@+id/monitoringButton"
-            android:text="Disable Monitoring"
-            android:onClick="monitoringButtonTapped"
+            android:id="@+id/button2"
+            android:text="Button 2"
+            android:onClick="button2Tapped"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1">
