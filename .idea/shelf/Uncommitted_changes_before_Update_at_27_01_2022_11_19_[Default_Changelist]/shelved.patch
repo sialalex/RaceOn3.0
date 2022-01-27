@@ -1,0 +1,242 @@
+Index: settings.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>include ':app'\r\n//include ':android-beacon-library:lib'\r\nrootProject.name = \"BeaconReference\"
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- settings.gradle	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ settings.gradle	(date 1643277859540)
+@@ -1,3 +1,3 @@
+ include ':app'
+ //include ':android-beacon-library:lib'
+-rootProject.name = "BeaconReference"
+\ No newline at end of file
++rootProject.name = "RaceOn3.0"
+\ No newline at end of file
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>apply plugin: 'com.android.application'\r\napply plugin: 'kotlin-android'\r\napply plugin: 'kotlin-android-extensions'\r\n\r\nandroid {\r\n    compileSdkVersion 30\r\n    buildToolsVersion \"30.0.3\" //31.0.0\r\n\r\n    defaultConfig {\r\n        applicationId \"org.altbeacon.beaconreference\"\r\n        minSdkVersion 26\r\n        targetSdkVersion 30\r\n        versionCode 1\r\n        versionName \"1.0\"\r\n\r\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            minifyEnabled false\r\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\r\n        }\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation fileTree(dir: \"libs\", include: [\"*.jar\"])\r\n    implementation \"org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version\"\r\n    implementation 'androidx.core:core-ktx:1.3.1'\r\n    implementation 'androidx.appcompat:appcompat:1.1.0'\r\n    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'\r\n    implementation 'org.altbeacon:android-beacon-library:2.19.3'\r\n    //implementation(name:'android-beacon-library-2.19-beta5-4-g3959dc9', ext:'aar')\r\n    //implementation project(':android-beacon-library:lib')\r\n    // Needed for legacy LocalBroadcastManager used by the library prior to library version 2.18\r\n    //implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'\r\n\r\n    //coroutines\r\n    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2'\r\n    implementation \"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2\"\r\n    //coroutine scopes\r\n    implementation \"androidx.lifecycle:lifecycle-runtime-ktx:2.2.0\"\r\n    testImplementation 'junit:junit:4.12'\r\n    androidTestImplementation 'androidx.test.ext:junit:1.1.1'\r\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ app/build.gradle	(date 1643277630288)
+@@ -7,7 +7,7 @@
+     buildToolsVersion "30.0.3" //31.0.0
+ 
+     defaultConfig {
+-        applicationId "org.altbeacon.beaconreference"
++        applicationId "com.ktm.asiala.prototype.raceon3"
+         minSdkVersion 26
+         targetSdkVersion 30
+         versionCode 1
+Index: gradle.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Project-wide Gradle settings.\r\n# IDE (e.g. Android Studio) users:\r\n# Gradle settings configured through the IDE *will override*\r\n# any settings specified in this file.\r\n# For more details on how to configure your build environment visit\r\n# http://www.gradle.org/docs/current/userguide/build_environment.html\r\n# Specifies the JVM arguments used for the daemon process.\r\n# The setting is particularly useful for tweaking memory settings.\r\norg.gradle.jvmargs=-Xmx2048m\r\n# When configured, Gradle will run in incubating parallel mode.\r\n# This option should only be used with decoupled projects. More details, visit\r\n# http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects\r\n# org.gradle.parallel=true\r\n# AndroidX package structure to make it clearer which packages are bundled with the\r\n# Android operating system, and which are packaged with your app\"s APK\r\n# https://developer.android.com/topic/libraries/support-library/androidx-rn\r\nandroid.useAndroidX=true\r\n# Automatically convert third-party libraries to use AndroidX\r\nandroid.enableJetifier=true\r\n# Kotlin code style for this project: \"official\" or \"obsolete\":\r\nkotlin.code.style=official
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- gradle.properties	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ gradle.properties	(date 1643275639151)
+@@ -6,7 +6,7 @@
+ # http://www.gradle.org/docs/current/userguide/build_environment.html
+ # Specifies the JVM arguments used for the daemon process.
+ # The setting is particularly useful for tweaking memory settings.
+-org.gradle.jvmargs=-Xmx2048m
++org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+ # When configured, Gradle will run in incubating parallel mode.
+ # This option should only be used with decoupled projects. More details, visit
+ # http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects
+Index: app/src/main/java/org/altbeacon/beaconreference/BeaconReferenceApplication.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.altbeacon.beaconreference\r\n\r\nimport android.app.*\r\nimport android.content.Context\r\nimport android.content.Intent\r\nimport android.util.Log\r\nimport androidx.core.app.NotificationCompat\r\nimport androidx.lifecycle.Observer\r\nimport org.altbeacon.beacon.*\r\nimport org.altbeacon.bluetooth.BluetoothMedic\r\n\r\nclass BeaconReferenceApplication: Application() {\r\n    lateinit var region: Region\r\n\r\n    override fun onCreate() {\r\n        super.onCreate()\r\n\r\n        val beaconManager = BeaconManager.getInstanceForApplication(this)\r\n        BeaconManager.setDebug(true)\r\n\r\n        // By default the AndroidBeaconLibrary will only find AltBeacons.  If you wish to make it\r\n        // find a different type of beacon, you must specify the byte layout for that beacon's\r\n        // advertisement with a line like below.  The example shows how to find a beacon with the\r\n        // same byte layout as AltBeacon but with a beaconTypeCode of 0xaabb.  To find the proper\r\n        // layout expression for other beacon types, do a web search for \"setBeaconLayout\"\r\n        // including the quotes.\r\n        //\r\n        //beaconManager.getBeaconParsers().clear();\r\n        //beaconManager.getBeaconParsers().add(new BeaconParser().\r\n        //        setBeaconLayout(\"m:0-1=4c00,i:2-24v,p:24-24\"));\r\n\r\n\r\n        // By default the AndroidBeaconLibrary will only find AltBeacons.  If you wish to make it\r\n        // find a different type of beacon like Eddystone or iBeacon, you must specify the byte layout\r\n        // for that beacon's advertisement with a line like below.\r\n        //\r\n        // If you don't care about AltBeacon, you can clear it from the defaults:\r\n        beaconManager.getBeaconParsers().clear()\r\n\r\n        // The example shows how to find iBeacon.\r\n        beaconManager.getBeaconParsers().add(\r\n            BeaconParser().\r\n                setBeaconLayout(\"m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24\"))\r\n\r\n        // enabling debugging will send lots of verbose debug information from the library to Logcat\r\n        // this is useful for troubleshooting problmes\r\n        // BeaconManager.setDebug(true)\r\n\r\n\r\n        // The BluetoothMedic code here, if included, will watch for problems with the bluetooth\r\n        // stack and optionally:\r\n        // - power cycle bluetooth to recover on bluetooth problems\r\n        // - periodically do a proactive scan or transmission to verify the bluetooth stack is OK\r\n        // BluetoothMedic.getInstance().enablePowerCycleOnFailures(this)\r\n        // BluetoothMedic.getInstance().enablePeriodicTests(this, BluetoothMedic.SCAN_TEST + BluetoothMedic.TRANSMIT_TEST)\r\n\r\n        // By default, the library will scan in the background every 5 minutes on Android 4-7,\r\n        // which will be limited to scan jobs scheduled every ~15 minutes on Android 8+\r\n        // If you want more frequent scanning (requires a foreground service on Android 8+),\r\n        // configure that here.\r\n        // If you want to continuously range beacons in the background more often than every 15 mintues,\r\n        // you can use the library's built-in foreground service to unlock this behavior on Android\r\n        // 8+.   the method below shows how you set that up.\r\n        setupForegroundService()\r\n        beaconManager.setEnableScheduledScanJobs(false);\r\n        beaconManager.setBackgroundBetweenScanPeriod(0);\r\n        beaconManager.setBackgroundScanPeriod(1100);\r\n\r\n        // Ranging callbacks will drop out if no beacons are detected\r\n        // Monitoring callbacks will be delayed by up to 25 minutes on region exit\r\n        // beaconManager.setIntentScanningStrategyEnabled(true)\r\n\r\n        // The code below will start \"monitoring\" for beacons matching the region definition below\r\n        // the region definition is a wildcard that matches all beacons regardless of identifiers.\r\n        // if you only want to detect beacons with a specific UUID, change the id1 paremeter to\r\n        // a UUID like Identifier.parse(\"2F234454-CF6D-4A0F-ADF2-F4911BA9FFA6\")\r\n        region = Region(\"radius-uuid\", null, null, null)\r\n        beaconManager.startMonitoring(region)\r\n        beaconManager.startRangingBeacons(region)\r\n        // These two lines set up a Live Data observer so this Activity can get beacon data from the Application class\r\n        val regionViewModel = BeaconManager.getInstanceForApplication(this).getRegionViewModel(region)\r\n        // observer will be called each time the monitored regionState changes (inside vs. outside region)\r\n        regionViewModel.regionState.observeForever( centralMonitoringObserver)\r\n        // observer will be called each time a new list of beacons is ranged (typically ~1 second in the foreground)\r\n        regionViewModel.rangedBeacons.observeForever( centralRangingObserver)\r\n    }\r\n\r\n    fun setupForegroundService() {\r\n        val builder = Notification.Builder(this, \"BeaconReferenceApp\")\r\n        builder.setSmallIcon(R.drawable.ic_launcher_background)\r\n        builder.setContentTitle(\"Scanning for Beacons\")\r\n        val intent = Intent(this, MainActivity::class.java)\r\n        val pendingIntent = PendingIntent.getActivity(\r\n                this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE\r\n        )\r\n        builder.setContentIntent(pendingIntent);\r\n        val channel =  NotificationChannel(\"beacon-ref-notification-id\",\r\n            \"My Notification Name\", NotificationManager.IMPORTANCE_DEFAULT)\r\n        channel.setDescription(\"My Notification Channel Description\")\r\n        val notificationManager =  getSystemService(\r\n                Context.NOTIFICATION_SERVICE) as NotificationManager\r\n        notificationManager.createNotificationChannel(channel);\r\n        builder.setChannelId(channel.getId());\r\n        BeaconManager.getInstanceForApplication(this).enableForegroundServiceScanning(builder.build(), 456);\r\n    }\r\n\r\n    val centralMonitoringObserver = Observer<Int> { state ->\r\n        if (state == MonitorNotifier.OUTSIDE) {\r\n            Log.d(TAG, \"outside beacon region: \"+region)\r\n        }\r\n        else {\r\n            Log.d(TAG, \"inside beacon region: \"+region)\r\n            sendNotification()\r\n        }\r\n    }\r\n\r\n    val centralRangingObserver = Observer<Collection<Beacon>> { beacons ->\r\n        Log.d(MainActivity.TAG, \"Ranged: ${beacons.count()} beacons\")\r\n        for (beacon: Beacon in beacons) {\r\n            Log.d(TAG, \"$beacon about ${beacon.distance} meters away\")\r\n        }\r\n    }\r\n\r\n    private fun sendNotification() {\r\n        val builder = NotificationCompat.Builder(this, \"beacon-ref-notification-id\")\r\n            .setContentTitle(\"Beacon Reference Application\")\r\n            .setContentText(\"A beacon is nearby.\")\r\n            .setSmallIcon(R.drawable.ic_launcher_background)\r\n        val stackBuilder = TaskStackBuilder.create(this)\r\n        stackBuilder.addNextIntent(Intent(this, MainActivity::class.java))\r\n        val resultPendingIntent = stackBuilder.getPendingIntent(\r\n            0,\r\n            PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE\r\n        )\r\n        builder.setContentIntent(resultPendingIntent)\r\n        val notificationManager =\r\n            this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager\r\n        notificationManager.notify(1, builder.build())\r\n    }\r\n\r\n    companion object {\r\n        val TAG = \"BeaconReference\"\r\n    }\r\n\r\n}
+===================================================================
+--- app/src/main/java/org/altbeacon/beaconreference/BeaconReferenceApplication.kt	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ app/src/main/java/com/ktm/asiala/prototype/raceon3/BeaconReferenceApplication.kt	(date 1643277630272)
+@@ -1,4 +1,4 @@
+-package org.altbeacon.beaconreference
++package com.ktm.asiala.prototype.raceon3
+ 
+ import android.app.*
+ import android.content.Context
+@@ -7,7 +7,7 @@
+ import androidx.core.app.NotificationCompat
+ import androidx.lifecycle.Observer
+ import org.altbeacon.beacon.*
+-import org.altbeacon.bluetooth.BluetoothMedic
++import org.altbeacon.raceon3.R
+ 
+ class BeaconReferenceApplication: Application() {
+     lateinit var region: Region
+Index: app/src/main/java/org/altbeacon/beaconreference/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.altbeacon.beaconreference\r\n\r\nimport android.Manifest\r\nimport android.app.AlertDialog\r\nimport android.content.pm.PackageManager\r\nimport android.os.Build\r\nimport android.os.Bundle\r\nimport android.util.Log\r\nimport android.view.View\r\nimport android.widget.ArrayAdapter\r\nimport android.widget.Button\r\nimport android.widget.ListView\r\nimport android.widget.TextView\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport androidx.lifecycle.Observer\r\nimport org.altbeacon.beacon.Beacon\r\nimport org.altbeacon.beacon.BeaconManager\r\nimport org.altbeacon.beacon.MonitorNotifier\r\n\r\nclass MainActivity : AppCompatActivity() {\r\n    lateinit var beaconListView: ListView\r\n    lateinit var beaconCountTextView: TextView\r\n    lateinit var monitoringButton: Button\r\n    lateinit var rangingButton: Button\r\n    lateinit var beaconReferenceApplication: BeaconReferenceApplication\r\n    var alertDialog: AlertDialog? = null\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        setContentView(R.layout.activity_main)\r\n        beaconReferenceApplication = application as BeaconReferenceApplication\r\n\r\n        // Set up a Live Data observer for beacon data\r\n        val regionViewModel = BeaconManager.getInstanceForApplication(this).getRegionViewModel(beaconReferenceApplication.region)\r\n        // observer will be called each time the monitored regionState changes (inside vs. outside region)\r\n        regionViewModel.regionState.observe(this, monitoringObserver)\r\n        // observer will be called each time a new list of beacons is ranged (typically ~1 second in the foreground)\r\n        regionViewModel.rangedBeacons.observe(this, rangingObserver)\r\n        rangingButton = findViewById<Button>(R.id.rangingButton)\r\n        monitoringButton = findViewById<Button>(R.id.monitoringButton)\r\n        beaconListView = findViewById<ListView>(R.id.beaconList)\r\n        beaconCountTextView = findViewById<TextView>(R.id.beaconCount)\r\n        beaconCountTextView.text = \"No beacons detected\"\r\n        beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf(\"--\"))\r\n    }\r\n\r\n    override fun onPause() {\r\n        Log.d(TAG, \"onPause\")\r\n        super.onPause()\r\n    }\r\n    override fun onResume() {\r\n        Log.d(TAG, \"onResume\")\r\n        super.onResume()\r\n        checkPermissions()\r\n    }\r\n\r\n    val monitoringObserver = Observer<Int> { state ->\r\n        var dialogTitle = \"Beacons detected\"\r\n        var dialogMessage = \"didEnterRegionEvent has fired\"\r\n        var stateString = \"inside\"\r\n        if (state == MonitorNotifier.OUTSIDE) {\r\n            dialogTitle = \"No beacons detected\"\r\n            dialogMessage = \"didExitRegionEvent has fired\"\r\n            stateString == \"outside\"\r\n            beaconCountTextView.text = \"Outside of the beacon region -- no beacons detected\"\r\n            beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf(\"--\"))\r\n        }\r\n        else {\r\n            beaconCountTextView.text = \"Inside the beacon region.\"\r\n        }\r\n        Log.d(TAG, \"monitoring state changed to : $stateString\")\r\n        val builder =\r\n            AlertDialog.Builder(this)\r\n        builder.setTitle(dialogTitle)\r\n        builder.setMessage(dialogMessage)\r\n        builder.setPositiveButton(android.R.string.ok, null)\r\n        alertDialog?.dismiss()\r\n        alertDialog = builder.create()\r\n        alertDialog?.show()\r\n    }\r\n\r\n    val rangingObserver = Observer<Collection<Beacon>> { beacons ->\r\n        Log.d(TAG, \"Ranged: ${beacons.count()} beacons\")\r\n        if (BeaconManager.getInstanceForApplication(this).rangedRegions.size > 0) {\r\n            beaconCountTextView.text = \"Ranging enabled: ${beacons.count()} beacon(s) detected\"\r\n            beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,\r\n                beacons\r\n                    .sortedBy { it.distance }\r\n                    .map { \"${it.id1}\\nid2: ${it.id2} id3:  rssi: ${it.rssi}\\nest. distance: ${it.distance} m\" }.toTypedArray())\r\n        }\r\n    }\r\n\r\n    fun rangingButtonTapped(view: View) {\r\n        val beaconManager = BeaconManager.getInstanceForApplication(this)\r\n        if (beaconManager.rangedRegions.size == 0) {\r\n            beaconManager.startRangingBeacons(beaconReferenceApplication.region)\r\n            rangingButton.text = \"Stop Ranging\"\r\n            beaconCountTextView.text = \"Ranging enabled -- awaiting first callback\"\r\n        }\r\n        else {\r\n            beaconManager.stopRangingBeacons(beaconReferenceApplication.region)\r\n            rangingButton.text = \"Start Ranging\"\r\n            beaconCountTextView.text = \"Ranging disabled -- no beacons detected\"\r\n            beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf(\"--\"))\r\n        }\r\n    }\r\n\r\n    fun monitoringButtonTapped(view: View) {\r\n        var dialogTitle = \"\"\r\n        var dialogMessage = \"\"\r\n        val beaconManager = BeaconManager.getInstanceForApplication(this)\r\n        if (beaconManager.monitoredRegions.size == 0) {\r\n            beaconManager.startMonitoring(beaconReferenceApplication.region)\r\n            dialogTitle = \"Beacon monitoring started.\"\r\n            dialogMessage = \"You will see a dialog if a beacon is detected, and another if beacons then stop being detected.\"\r\n            monitoringButton.text = \"Stop Monitoring\"\r\n\r\n        }\r\n        else {\r\n            beaconManager.stopMonitoring(beaconReferenceApplication.region)\r\n            dialogTitle = \"Beacon monitoring stopped.\"\r\n            dialogMessage = \"You will no longer see dialogs when becaons start/stop being detected.\"\r\n            monitoringButton.text = \"Start Monitoring\"\r\n        }\r\n        val builder =\r\n            AlertDialog.Builder(this)\r\n        builder.setTitle(dialogTitle)\r\n        builder.setMessage(dialogMessage)\r\n        builder.setPositiveButton(android.R.string.ok, null)\r\n        alertDialog?.dismiss()\r\n        alertDialog = builder.create()\r\n        alertDialog?.show()\r\n\r\n    }\r\n\r\n    override fun onRequestPermissionsResult(\r\n        requestCode: Int,\r\n        permissions: Array<out String>,\r\n        grantResults: IntArray\r\n    ) {\r\n        super.onRequestPermissionsResult(requestCode, permissions, grantResults)\r\n        for (i in 1..permissions.size-1) {\r\n            Log.d(TAG, \"onRequestPermissionResult for \"+permissions[i]+\":\" +grantResults[i])\r\n        }\r\n    }\r\n\r\n\r\n    fun checkPermissions() {\r\n        // basepermissions are for M and higher\r\n        var permissions = arrayOf( Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION)\r\n        var permissionRationale =\"This app needs both fine location permission and background location permission to detect beacons in the background.  Please grant both now.\"\r\n        if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {\r\n            permissions = arrayOf( Manifest.permission.ACCESS_FINE_LOCATION)\r\n            permissionRationale =\"This app needs fine location permission and nearby devices permission to detect beacons.  Please grant this now.\"\r\n        }\r\n        if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {\r\n            // Uncomment line below if targeting SDK 31\r\n            // permissions = arrayOf( Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_SCAN)\r\n            permissionRationale =\"This app needs both fine location permission and nearby devices permission to detect beacons.  Please grant both now.\"\r\n        }\r\n        var allGranted = true\r\n        for (permission in permissions) {\r\n            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) allGranted = false;\r\n        }\r\n        if (!allGranted) {\r\n            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {\r\n                val builder =\r\n                    AlertDialog.Builder(this)\r\n                builder.setTitle(\"This app needs permissions to detect beacons\")\r\n                builder.setMessage(permissionRationale)\r\n                builder.setPositiveButton(android.R.string.ok, null)\r\n                builder.setOnDismissListener {\r\n                    requestPermissions(\r\n                        permissions,\r\n                        PERMISSION_REQUEST_FINE_LOCATION\r\n                    )\r\n                }\r\n                builder.show()\r\n            }\r\n            else {\r\n                val builder =\r\n                    AlertDialog.Builder(this)\r\n                builder.setTitle(\"Functionality limited\")\r\n                builder.setMessage(\"Since location and device permissions have not been granted, this app will not be able to discover beacons.  Please go to Settings -> Applications -> Permissions and grant location and device discovery permissions to this app.\")\r\n                builder.setPositiveButton(android.R.string.ok, null)\r\n                builder.setOnDismissListener { }\r\n                builder.show()\r\n            }\r\n        }\r\n        else {\r\n            if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {\r\n                if (checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)\r\n                    != PackageManager.PERMISSION_GRANTED\r\n                ) {\r\n                    if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {\r\n                        val builder =\r\n                            AlertDialog.Builder(this)\r\n                        builder.setTitle(\"This app needs background location access\")\r\n                        builder.setMessage(\"Please grant location access so this app can detect beacons in the background.\")\r\n                        builder.setPositiveButton(android.R.string.ok, null)\r\n                        builder.setOnDismissListener {\r\n                            requestPermissions(\r\n                                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),\r\n                                PERMISSION_REQUEST_BACKGROUND_LOCATION\r\n                            )\r\n                        }\r\n                        builder.show()\r\n                    } else {\r\n                        val builder =\r\n                            AlertDialog.Builder(this)\r\n                        builder.setTitle(\"Functionality limited\")\r\n                        builder.setMessage(\"Since background location access has not been granted, this app will not be able to discover beacons in the background.  Please go to Settings -> Applications -> Permissions and grant background location access to this app.\")\r\n                        builder.setPositiveButton(android.R.string.ok, null)\r\n                        builder.setOnDismissListener { }\r\n                        builder.show()\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    companion object {\r\n        val TAG = \"MainActivity\"\r\n        val PERMISSION_REQUEST_BACKGROUND_LOCATION = 0\r\n        val PERMISSION_REQUEST_FINE_LOCATION = 1\r\n    }\r\n\r\n}
+===================================================================
+--- app/src/main/java/org/altbeacon/beaconreference/MainActivity.kt	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ app/src/main/java/com/ktm/asiala/prototype/raceon3/MainActivity.kt	(date 1643277992665)
+@@ -1,4 +1,4 @@
+-package org.altbeacon.beaconreference
++package com.ktm.asiala.prototype.raceon3
+ 
+ import android.Manifest
+ import android.app.AlertDialog
+@@ -16,6 +16,7 @@
+ import org.altbeacon.beacon.Beacon
+ import org.altbeacon.beacon.BeaconManager
+ import org.altbeacon.beacon.MonitorNotifier
++import org.altbeacon.raceon3.R
+ 
+ class MainActivity : AppCompatActivity() {
+     lateinit var beaconListView: ListView
+@@ -52,6 +53,14 @@
+         Log.d(TAG, "onResume")
+         super.onResume()
+         checkPermissions()
++
++        startRangingAndMonitoring()
++    }
++
++    fun startRangingAndMonitoring(){
++        val beaconManager = BeaconManager.getInstanceForApplication(this)
++        beaconManager.startRangingBeacons(beaconReferenceApplication.region)
++        beaconManager.startMonitoring(beaconReferenceApplication.region)
+     }
+ 
+     val monitoringObserver = Observer<Int> { state ->
+Index: app/src/androidTest/java/org/altbeacon/beaconreference/ExampleInstrumentedTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.altbeacon.beaconreference\r\n\r\nimport androidx.test.platform.app.InstrumentationRegistry\r\nimport androidx.test.ext.junit.runners.AndroidJUnit4\r\n\r\nimport org.junit.Test\r\nimport org.junit.runner.RunWith\r\n\r\nimport org.junit.Assert.*\r\n\r\n/**\r\n * Instrumented test, which will execute on an Android device.\r\n *\r\n * See [testing documentation](http://d.android.com/tools/testing).\r\n */\r\n@RunWith(AndroidJUnit4::class)\r\nclass ExampleInstrumentedTest {\r\n    @Test\r\n    fun useAppContext() {\r\n        // Context of the app under test.\r\n        val appContext = InstrumentationRegistry.getInstrumentation().targetContext\r\n        assertEquals(\"org.altbeacon.beaconreference\", appContext.packageName)\r\n    }\r\n}
+===================================================================
+--- app/src/androidTest/java/org/altbeacon/beaconreference/ExampleInstrumentedTest.kt	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ app/src/androidTest/java/org/altbeacon/raceon3/ExampleInstrumentedTest.kt	(date 1643276360842)
+@@ -1,4 +1,4 @@
+-package org.altbeacon.beaconreference
++package org.altbeacon.raceon3
+ 
+ import androidx.test.platform.app.InstrumentationRegistry
+ import androidx.test.ext.junit.runners.AndroidJUnit4
+Index: .idea/.name
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>BeaconReference
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/.name	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ .idea/.name	(date 1643277861559)
+@@ -1,1 +1,1 @@
+-BeaconReference
+\ No newline at end of file
++RaceOn3.0
+\ No newline at end of file
+Index: app/src/main/res/values/strings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><resources>\r\n    <string name=\"app_name\">BeaconReference</string>\r\n</resources>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/values/strings.xml	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ app/src/main/res/values/strings.xml	(date 1643276788138)
+@@ -1,3 +1,3 @@
+ <resources>
+-    <string name="app_name">BeaconReference</string>
++    <string name="app_name">RaceOn3.0</string>
+ </resources>
+\ No newline at end of file
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    package=\"org.altbeacon.beaconreference\">\r\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\"/>\r\n    <uses-permission android:name=\"android.permission.INTERNET\"/>\r\n    <uses-permission android:name=\"android.permission.ACCESS_BACKGROUND_LOCATION\" />\r\n    <uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />\r\n\r\n    <application\r\n        android:name=\"BeaconReferenceApplication\"\r\n        android:allowBackup=\"true\"\r\n        android:icon=\"@mipmap/ic_launcher\"\r\n        android:label=\"@string/app_name\"\r\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\r\n        android:supportsRtl=\"true\"\r\n        android:theme=\"@style/AppTheme\">\r\n        <activity android:name=\".MainActivity\" android:exported=\"true\">\r\n            <intent-filter>\r\n                <action android:name=\"android.intent.action.MAIN\" />\r\n                <category android:name=\"android.intent.category.LAUNCHER\" />\r\n            </intent-filter>\r\n        </activity>\r\n    </application>\r\n\r\n</manifest>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ app/src/main/AndroidManifest.xml	(date 1643277630257)
+@@ -1,20 +1,20 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+-    package="org.altbeacon.beaconreference">
++    package="org.altbeacon.raceon3">
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+     <uses-permission android:name="android.permission.INTERNET"/>
+     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+ 
+     <application
+-        android:name="BeaconReferenceApplication"
++        android:name="com.ktm.asiala.prototype.raceon3.BeaconReferenceApplication"
+         android:allowBackup="true"
+         android:icon="@mipmap/ic_launcher"
+         android:label="@string/app_name"
+         android:roundIcon="@mipmap/ic_launcher_round"
+         android:supportsRtl="true"
+         android:theme="@style/AppTheme">
+-        <activity android:name=".MainActivity" android:exported="true">
++        <activity android:name="com.ktm.asiala.prototype.raceon3.MainActivity" android:exported="true">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+                 <category android:name="android.intent.category.LAUNCHER" />
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"GradleMigrationSettings\" migrationVersion=\"1\" />\r\n  <component name=\"GradleSettings\">\r\n    <option name=\"linkedExternalProjectsSettings\">\r\n      <GradleProjectSettings>\r\n        <option name=\"testRunner\" value=\"GRADLE\" />\r\n        <option name=\"distributionType\" value=\"DEFAULT_WRAPPED\" />\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"modules\">\r\n          <set>\r\n            <option value=\"$PROJECT_DIR$\" />\r\n            <option value=\"$PROJECT_DIR$/app\" />\r\n          </set>\r\n        </option>\r\n        <option name=\"resolveModulePerSourceSet\" value=\"false\" />\r\n      </GradleProjectSettings>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/gradle.xml	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ .idea/gradle.xml	(date 1643268690590)
+@@ -4,7 +4,7 @@
+   <component name="GradleSettings">
+     <option name="linkedExternalProjectsSettings">
+       <GradleProjectSettings>
+-        <option name="testRunner" value="GRADLE" />
++        <option name="testRunner" value="PLATFORM" />
+         <option name="distributionType" value="DEFAULT_WRAPPED" />
+         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+         <option name="modules">
+@@ -14,6 +14,7 @@
+           </set>
+         </option>
+         <option name="resolveModulePerSourceSet" value="false" />
++        <option name="useQualifiedModuleNames" value="true" />
+       </GradleProjectSettings>
+     </option>
+   </component>
+Index: app/src/main/res/layout/activity_main.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:orientation=\"vertical\"\r\n    tools:context=\".MainActivity\">\r\n\r\n    <TextView\r\n        android:id=\"@+id/beaconCount\"\r\n        android:text=\"0 visible beacons:\"\r\n        android:textAlignment=\"center\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"20dp\"/>\r\n    <ListView\r\n        android:id=\"@+id/beaconList\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_weight=\"1\">\r\n    </ListView>\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"horizontal\"\r\n        android:layout_weight=\"0\">\r\n        <Button\r\n            android:id=\"@+id/rangingButton\"\r\n            android:onClick=\"rangingButtonTapped\"\r\n            android:text=\"Disable Ranging\"\r\n            android:layout_width=\"0dp\"\r\n            android:layout_height=\"50dp\"\r\n            android:layout_weight=\"1\">\r\n        </Button>\r\n        <Button\r\n            android:id=\"@+id/monitoringButton\"\r\n            android:text=\"Disable Monitoring\"\r\n            android:onClick=\"monitoringButtonTapped\"\r\n            android:layout_width=\"0dp\"\r\n            android:layout_height=\"50dp\"\r\n            android:layout_weight=\"1\">\r\n        </Button>\r\n    </LinearLayout>\r\n\r\n</LinearLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_main.xml	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ app/src/main/res/layout/activity_main.xml	(date 1643277630272)
+@@ -5,7 +5,7 @@
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical"
+-    tools:context=".MainActivity">
++    tools:context="com.ktm.asiala.prototype.raceon3.MainActivity">
+ 
+     <TextView
+         android:id="@+id/beaconCount"
+Index: app/src/test/java/org/altbeacon/beaconreference/ExampleUnitTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.altbeacon.beaconreference\r\n\r\nimport org.junit.Test\r\n\r\nimport org.junit.Assert.*\r\n\r\n/**\r\n * Example local unit test, which will execute on the development machine (host).\r\n *\r\n * See [testing documentation](http://d.android.com/tools/testing).\r\n */\r\nclass ExampleUnitTest {\r\n    @Test\r\n    fun addition_isCorrect() {\r\n        assertEquals(4, 2 + 2)\r\n    }\r\n}
+===================================================================
+--- app/src/test/java/org/altbeacon/beaconreference/ExampleUnitTest.kt	(revision f07262e489c8286d83f1ae62b025fe081d594a56)
++++ app/src/test/java/org/altbeacon/raceon3/ExampleUnitTest.kt	(date 1643276360830)
+@@ -1,4 +1,4 @@
+-package org.altbeacon.beaconreference
++package org.altbeacon.raceon3
+ 
+ import org.junit.Test
+ 
