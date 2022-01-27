@@ -1,4 +1,4 @@
-package org.altbeacon.beaconreference
+package com.ktm.asiala.raceon3
 
 import android.Manifest
 import android.app.AlertDialog
@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import org.altbeacon.beacon.Beacon
 import org.altbeacon.beacon.BeaconManager
 import org.altbeacon.beacon.MonitorNotifier
+import org.altbeacon.beaconreference.R
 
 class MainActivity : AppCompatActivity() {
     lateinit var beaconListView: ListView

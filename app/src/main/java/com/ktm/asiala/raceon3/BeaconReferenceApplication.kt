@@ -1,4 +1,4 @@
-package org.altbeacon.beaconreference
+package com.ktm.asiala.raceon3
 
 import android.app.*
 import android.content.Context
@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import org.altbeacon.beacon.*
-import org.altbeacon.bluetooth.BluetoothMedic
+import org.altbeacon.beaconreference.R
 
 class BeaconReferenceApplication: Application() {
     lateinit var region: Region
