@@ -16,6 +16,8 @@ import androidx.lifecycle.Observer
 import org.altbeacon.beacon.Beacon
 import org.altbeacon.beacon.BeaconManager
 import org.altbeacon.beaconreference.R
+import java.security.KeyStore
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -110,7 +112,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun button1Tapped(view: View) {
+        val ks: KeyStore = KeyStore.getInstance("AndroidKeyStore").apply {
+            load(null)
+        }
+        val aliases: Enumeration<String> = ks.aliases()
 
+        Log.d(TAG, "Searching for alisases")
     }
 
     fun button2Tapped(view: View) {
@@ -211,6 +218,8 @@ class MainActivity : AppCompatActivity() {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.d(TAG, "Connected")
                 beaconStateTextView.setText("Connected! Bonded!")
+
+                //Add here getting the services
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d(TAG, "Disconnect")
