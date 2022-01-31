@@ -3,7 +3,6 @@ package com.ktm.asiala.raceon3
 import android.Manifest
 import android.app.AlertDialog
 import android.bluetooth.*
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -13,31 +12,24 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import kotlinx.android.synthetic.main.activity_main.*
 import org.altbeacon.beacon.Beacon
 import org.altbeacon.beacon.BeaconManager
 import org.altbeacon.beaconreference.R
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     //Views
     lateinit var beaconStateTextView: TextView
     lateinit var beaconCountTextView: TextView
-    lateinit var readButton: Button
-    lateinit var writeButton: Button
+    lateinit var updateButton: Button
+    lateinit var disconnectButton: Button
     var alertDialog: AlertDialog? = null
 
     //BLE variables
     lateinit var beaconReferenceApplication: BeaconReferenceApplication
-    lateinit var mBluetoothManager: BluetoothManager
     lateinit var mBluetoothGatt: BluetoothGatt
 
-    var RACEON3_SERVICE_UUID: UUID = UUID.fromString("71ced1ac-0000-44f5-9454-806ff70b3e02")
-    var RACEON3_CHARAC_UUID: UUID = UUID.fromString("4116f8d2-9f66-4f58-a53d-fc7440e7c14e")
-    var RACEON3_DESC_UUID: UUID = convertFromInteger(0x2902)
-
-    lateinit var raceon3_characteristic: BluetoothGattCharacteristic
-    lateinit var raceon3_descriptor: BluetoothGattDescriptor
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,10 +46,10 @@ class MainActivity : AppCompatActivity() {
         regionViewModel.rangedBeacons.observe(this, rangingObserver)
 
         //Link views with variables
-        readButton = findViewById<Button>(R.id.readButton)
-        writeButton = findViewById<Button>(R.id.writeButton)
+        updateButton = findViewById<Button>(R.id.updateButton)
+        disconnectButton = findViewById<Button>(R.id.disconnectButton)
         beaconStateTextView = findViewById<TextView>(R.id.beaconState)
-        beaconCountTextView = findViewById<TextView>(R.id.beaconCount)
+        beaconCountTextView = findViewById<TextView>(R.id.beaconInformation)
         beaconCountTextView.text = "Searching..."
     }
 
@@ -74,10 +66,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        writeButton.performClick()
-        mBluetoothGatt.disconnect()
-        mBluetoothGatt.close()
     }
 
     //Not used right now
@@ -108,37 +96,16 @@ class MainActivity : AppCompatActivity() {
 
     //Check if the right beacon is found
     val rangingObserver = Observer<Collection<Beacon>> { beacons ->
-        Log.d(TAG, "Ranged: ${beacons.count()} beacons")
 
-        //Check if the required beacon is found
-        if (beacons.size != 0) {
-            beacons.forEach { beacon ->
-                if (beacon.bluetoothName.equals("RaceOn")) {
-                    Log.d(TAG, "Found the right RaceOn Beacon")
-
-                    beaconCountTextView.setText("Found the motorcycle! " + beacon.bluetoothAddress)
-                    beaconStateTextView.setText("Connecting...")
-
-                    //Stop searching for more beacons
-                    val beaconManager = BeaconManager.getInstanceForApplication(this)
-                    beaconManager.stopMonitoring(beaconReferenceApplication.region);
-                    beaconManager.stopRangingBeacons(beaconReferenceApplication.region);
-
-                    //Connect to the device
-                    connectAndBondWithMotorcycle(beacon.bluetoothAddress);
-                }
-            }
-        }
     }
 
-    fun readButtonClicked(view: View) {
-        raceon3_descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-        mBluetoothGatt.writeDescriptor(raceon3_descriptor)
+    fun updateButtonClicked(view: View) {
+        beaconStateTextView.setText(beaconReferenceApplication.beaconState)
+        beaconInformation.setText(beaconReferenceApplication.beaconInformation)
     }
 
-    fun writeButtonClicked(view: View) {
-        raceon3_descriptor.value = BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
-        mBluetoothGatt.writeDescriptor(raceon3_descriptor)
+    fun disconnectButtonClicked(view: View) {
+        beaconReferenceApplication.disconnectGatt()
     }
 
 
@@ -234,83 +201,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //Connect / Bond the smartphone with the motorcycle (over the mac address)
-    fun connectAndBondWithMotorcycle(macAdress: String) {
-        mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
-        val mBluetoothAdapter = mBluetoothManager.getAdapter();
-        val device: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(macAdress)
-        device.connectGatt(this, false, bluetoothGattCallback)
-        //device.createBond();
-    }
-
-    //Create GATT Callback
-    private val bluetoothGattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.d(TAG, "Connected")
-                beaconStateTextView.setText("Connected! Bonded!")
-
-                //Save the bluetooth gatt
-                if (gatt != null) {
-                    mBluetoothGatt = gatt
-                    mBluetoothGatt.discoverServices()
-                }
-
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.d(TAG, "Disconnect")
-                beaconStateTextView.setText("Disconnected!")
-            }
-        }
-
-        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            super.onServicesDiscovered(gatt, status)
-            Log.d(TAG, "Found services")
-
-            raceon3_characteristic =
-                mBluetoothGatt.getService(RACEON3_SERVICE_UUID)
-                    .getCharacteristic(RACEON3_CHARAC_UUID)
-
-            raceon3_descriptor = raceon3_characteristic.getDescriptor(RACEON3_DESC_UUID)
-            if(raceon3_descriptor.value == null){
-                raceon3_descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-            }else{
-                raceon3_descriptor.value = BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
-            }
-            mBluetoothGatt.writeDescriptor(raceon3_descriptor)
-
-        }
-
-        override fun onCharacteristicWrite(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
-            status: Int
-        ) {
-            super.onCharacteristicWrite(gatt, characteristic, status)
-        }
-
-        //Enabled Notifications
-        override fun onDescriptorWrite(
-            gatt: BluetoothGatt?,
-            descriptor: BluetoothGattDescriptor?,
-            status: Int
-        ) {
-            super.onDescriptorWrite(gatt, descriptor, status)
-
-            if (mBluetoothGatt != null) {
-                mBluetoothGatt.setCharacteristicNotification(raceon3_characteristic, true)
-                raceon3_characteristic.setValue("187 Straßenbande")
-                mBluetoothGatt.writeCharacteristic(raceon3_characteristic)
-            }
-        }
-    }
-
-    //Convert Integer to UUID
-    fun convertFromInteger(i: Int): UUID {
-        val MSB = 0x0000000000001000L
-        val LSB = -0x7fffff7fa064cb05L
-        val value = (i and (-0x1.toLong()).toInt()).toLong()
-        return UUID(MSB or (value shl 32), LSB)
-    }
 
     companion object {
         val TAG = "MainActivity"
