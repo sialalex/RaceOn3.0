@@ -102,10 +102,15 @@ class MainActivity : AppCompatActivity() {
     fun updateButtonClicked(view: View) {
         beaconStateTextView.setText(beaconReferenceApplication.beaconState)
         beaconInformation.setText(beaconReferenceApplication.beaconInformation)
+        keyTextView.setText(beaconReferenceApplication.key)
     }
 
     fun disconnectButtonClicked(view: View) {
         beaconReferenceApplication.disconnectGatt()
+    }
+
+    fun getKeyButtonClicked(view: View){
+        beaconReferenceApplication.readCharacteristic()
     }
 
 

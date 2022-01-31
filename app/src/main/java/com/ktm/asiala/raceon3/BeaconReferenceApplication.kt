@@ -9,7 +9,9 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import org.altbeacon.beacon.*
 import org.altbeacon.beaconreference.R
+import java.nio.charset.StandardCharsets
 import java.util.*
+
 
 class BeaconReferenceApplication : Application() {
     lateinit var region: Region
@@ -22,6 +24,7 @@ class BeaconReferenceApplication : Application() {
 
     var beaconState = "Unknown"
     var beaconInformation = "Unknown"
+    var key = "NO KEY"
 
     lateinit var raceon3_characteristic: BluetoothGattCharacteristic
     lateinit var raceon3_descriptor: BluetoothGattDescriptor
@@ -117,6 +120,12 @@ class BeaconReferenceApplication : Application() {
         notificationManager.cancelAll()
     }
 
+    fun readCharacteristic(){
+        if(mBluetoothGatt != null){
+            mBluetoothGatt.readCharacteristic(raceon3_characteristic)
+        }
+    }
+
     fun setupForegroundService() {
         val builder = Notification.Builder(this, "BeaconReferenceApp")
         builder.setSmallIcon(R.drawable.ic_launcher_background)
@@ -168,7 +177,7 @@ class BeaconReferenceApplication : Application() {
                         beaconManager.stopRangingBeacons(region);
 
                         //Connect to the device
-                        connectAndBondWithMotorcycle(beacon.bluetoothAddress);
+                        connectWithMotorcycle(beacon.bluetoothAddress);
                     }
                 }
             }
@@ -178,7 +187,7 @@ class BeaconReferenceApplication : Application() {
     }
 
     //Connect / Bond the smartphone with the motorcycle (over the mac address)
-    fun connectAndBondWithMotorcycle(macAdress: String) {
+    fun connectWithMotorcycle(macAdress: String) {
         mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
         val mBluetoothAdapter = mBluetoothManager.getAdapter();
         val device: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(macAdress)
@@ -224,14 +233,6 @@ class BeaconReferenceApplication : Application() {
 
         }
 
-        override fun onCharacteristicWrite(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
-            status: Int
-        ) {
-            super.onCharacteristicWrite(gatt, characteristic, status)
-        }
-
         //Enabled Notifications
         override fun onDescriptorWrite(
             gatt: BluetoothGatt?,
@@ -274,6 +275,16 @@ class BeaconReferenceApplication : Application() {
             }
         }
 
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            super.onCharacteristicWrite(gatt, characteristic, status)
+            Log.d(TAG, "Writing characteristic!")
+        }
+
+
         override fun onCharacteristicRead(
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?,
@@ -281,6 +292,12 @@ class BeaconReferenceApplication : Application() {
         ) {
             super.onCharacteristicRead(gatt, characteristic, status)
             Log.d(TAG, "Reading characteristic!")
+            if (characteristic != null) {
+                key = ""
+                for(value in characteristic.value){
+                    key += " "+ value
+                }
+            }
         }
     }
 
