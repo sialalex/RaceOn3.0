@@ -124,7 +124,7 @@ class BeaconReferenceApplication: Application() {
     private fun sendNotification() {
         val builder = NotificationCompat.Builder(this, "beacon-ref-notification-id")
             .setContentTitle("Beacon Reference Application")
-            .setContentText("A beacon is nearby.")
+            .setContentText("A beacon is nearby (Now i can do something.")
             .setSmallIcon(R.drawable.ic_launcher_background)
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntent(Intent(this, MainActivity::class.java))

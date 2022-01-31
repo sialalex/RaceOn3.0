@@ -25,17 +25,17 @@
         android:orientation="horizontal"
         android:layout_weight="0">
         <Button
-            android:id="@+id/button1"
-            android:onClick="button1Tapped"
+            android:id="@+id/readButton"
+            android:onClick="readButtonClicked"
             android:text="Button 1"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1">
         </Button>
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/writeButton"
             android:text="Button 2"
-            android:onClick="button2Tapped"
+            android:onClick="writeButtonClicked"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1">
