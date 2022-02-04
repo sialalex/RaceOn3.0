@@ -4,7 +4,9 @@ import android.app.*
 import android.bluetooth.*
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import org.altbeacon.beacon.*
@@ -17,10 +19,6 @@ class BeaconReferenceApplication : Application() {
     lateinit var region: Region
     lateinit var mBluetoothManager: BluetoothManager
     lateinit var mBluetoothGatt: BluetoothGatt
-
-    var RACEON3_SERVICE_UUID: UUID = UUID.fromString("71ced1ac-0000-44f5-9454-806ff70b3e02")
-    var RACEON3_CHARAC_UUID: UUID = UUID.fromString("4116f8d2-9f66-4f58-a53d-fc7440e7c14e")
-    var RACEON3_DESC_UUID: UUID = convertFromInteger(0x2902)
 
     var beaconState = "Unknown"
     var beaconInformation = "Unknown"
@@ -158,6 +156,7 @@ class BeaconReferenceApplication : Application() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     val centralRangingObserver = Observer<Collection<Beacon>> { beacons ->
         Log.d(MainActivity.TAG, "Ranged: ${beacons.count()} beacons")
         for (beacon: Beacon in beacons) {
@@ -187,118 +186,14 @@ class BeaconReferenceApplication : Application() {
     }
 
     //Connect / Bond the smartphone with the motorcycle (over the mac address)
+    @RequiresApi(Build.VERSION_CODES.Q)
     fun connectWithMotorcycle(macAdress: String) {
         mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
         val mBluetoothAdapter = mBluetoothManager.getAdapter();
         val device: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(macAdress)
-        device.connectGatt(this, false, bluetoothGattCallback)
-        //device.createBond();
-    }
+        val mBluetoothSocket : BluetoothSocket = device.createL2capChannel(187)
+        Log.d(TAG, mBluetoothSocket.isConnected.toString())
 
-    //Create GATT Callback
-    private val bluetoothGattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.d(MainActivity.TAG, "Connected")
-                beaconState = "Connected! Bonded!"
-                sendNotification("Connected!", "Successfully connected with RaceOn!")
-
-                //Save the bluetooth gatt
-                if (gatt != null) {
-                    mBluetoothGatt = gatt
-                    mBluetoothGatt.discoverServices()
-                }
-
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.d(MainActivity.TAG, "Disconnect")
-                beaconState = "Disconnected!"
-            }
-        }
-
-        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            super.onServicesDiscovered(gatt, status)
-            Log.d(MainActivity.TAG, "Found services")
-
-            raceon3_characteristic =
-                mBluetoothGatt.getService(RACEON3_SERVICE_UUID)
-                    .getCharacteristic(RACEON3_CHARAC_UUID)
-
-            raceon3_descriptor = raceon3_characteristic.getDescriptor(RACEON3_DESC_UUID)
-            if (raceon3_descriptor.value == null) {
-                raceon3_descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-            } else {
-                raceon3_descriptor.value = BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
-            }
-            mBluetoothGatt.writeDescriptor(raceon3_descriptor)
-
-        }
-
-        //Enabled Notifications
-        override fun onDescriptorWrite(
-            gatt: BluetoothGatt?,
-            descriptor: BluetoothGattDescriptor?,
-            status: Int
-        ) {
-            super.onDescriptorWrite(gatt, descriptor, status)
-
-            if (mBluetoothGatt != null) {
-                mBluetoothGatt.setCharacteristicNotification(raceon3_characteristic, true)
-                raceon3_characteristic.setValue(
-                    "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDM6puC5oNcmnA+\n" +
-                            "rxI5hjifCQzTjy3NVvLeNJyaAxNl3kaHQndzANwVcELdz20tTJYt7RRAcFu6jVrr\n" +
-                            "FDiNtHJP24mAaAZDg4bWhtlRuscQNDzwUbnlocHVmV87GNRq+jb77SGwT32Vzo3I\n" +
-                            "g1GeQZh339kZKlaUUoAV/xi65v93uHDmmqCsDSVJ6QF7uYf+viL1T92KU/l3bTlV\n" +
-                            "iyOVLeynQOqE0HkRwenjuQcDBjp8r3uWHdznMqdf5Z/9q2zErx3CirmIV5m8vny3\n" +
-                            "JbW+SrkD7lh7A4zCRwqbbRbYF82K1uj2cQhWUz11dzr2EfbJ52KWSqb7hem3zFDm\n" +
-                            "++RXHdfNAgMBAAECggEAEnHPm6G6EzzHe6zwfAML16zN3cEWg1QfOkcMDYTXWyT9\n" +
-                            "vjEKZWyfYsKfEi4YiqpJHksntoEmkI0msOA6Eu86FtwQ7WDvp2YQXgD3ULb6Mggx\n" +
-                            "sAP7MqMzulE61Cvw+swY5OY8UQ1mpXRZKMJBN3h6C9g3R1+bOXCPnOtAQ5qFRjZH\n" +
-                            "cm4d9ehvoVzZCPxfcgvjSv6UuqEXN0URjqcUWEe7L7+wiEoTpBVSqNYziclBmPw7\n" +
-                            "VemIZ/K05YlZ9soBEq6yoThHuneKhkCRIEb5kHzqG/CS3ocE3rmkreR0Qis637fL\n" +
-                            "1qyOl5/WbUz6GG/HOHxt14jvRcAlDq1ebi8uZ+1/QQKBgQD7SqNpVWMyg1oqVoLV\n" +
-                            "pb1sP39+3BMjHPdh8sOnZf3/3QdNnC04K5zLIBpUqcby6Kfi7fw7pEpsaRyUffy/\n" +
-                            "1GqiGbxs30D+I47GMF94Cdfe8jN+zng1fjen8KJ91YN3VViBDH8ehH5M0OSByYXj\n" +
-                            "jOZwt7wfOqXW3+DnEunwsylkkQKBgQDQwYXuu+RspMYyrWBW2SPk49IH66sJdahz\n" +
-                            "MaBBD87IJFKvLgv5VIFv6PKRMZdQ2tFhGiQ4TlvvGF0uYk3GjnXP5Zv2Ad4ErARM\n" +
-                            "pOM8uuTfrH99wR6R/kxtfkKVmRpjiL5vnj48yYY3HSgJLjOlhMw/ExO5gBCv0ZvG\n" +
-                            "Xt8FbbZtfQKBgQCGp5I1KWpEcRppwX3OWkfMr6H0Kp2enTD6rYmmNAMNjjURo3Sf\n" +
-                            "us8EEanKYEeZdo4wDfKxSvIOcay87V34tSyGvF+5v1AmXottLBKcUjn437Q0aRMF\n" +
-                            "JyNPvKR15WnTEkqgrD+Z7Ml5BB7OZVx3eNMq52nJGjYvlDwB1qLBNmAh4QKBgQCR\n" +
-                            "cQM7HTU8bGCaFik02PwlEITYd90mLg86kqywJ69NyeDBpDc7cyDrM0Us23wtHQcb\n" +
-                            "u/bYM9/haPwiwOKnH8H9Il/SueJRJven3oljWmLzY18/4jjGRoJBFuKVD6JPDop/\n" +
-                            "gaSi/VTBOVMXclURUMBsgYIQj6UQmd0KDDcdtR6QkQKBgBae8QKaFG6aY2uLSVBj\n" +
-                            "oKcGHy27P4Y6F4JPUDNvwqhefpp6RTYCEsQvbvKFWU6pLF7SWMXc7OTAcFQzYBnS\n" +
-                            "LGOVlt757SYtpioVFUsfjf6DwBn8ZktVatZ0S+z3Qf4QEZ1eLo1avsbxzD/DeBsw\n" +
-                            "XRbwOLi+mCgsjRC0+RFBjmcV"
-                )
-                mBluetoothGatt.writeCharacteristic(raceon3_characteristic)
-            }
-        }
-
-        override fun onCharacteristicWrite(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
-            status: Int
-        ) {
-            super.onCharacteristicWrite(gatt, characteristic, status)
-            Log.d(TAG, "Writing characteristic!")
-        }
-
-
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
-            status: Int
-        ) {
-            super.onCharacteristicRead(gatt, characteristic, status)
-            Log.d(TAG, "Reading characteristic!")
-            if (characteristic != null) {
-                key = ""
-                for(value in characteristic.value){
-                    key += " "+ value
-                }
-            }
-        }
     }
 
     private fun sendNotification(title: String, text: String) {
