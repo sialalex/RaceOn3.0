@@ -3,6 +3,10 @@ package com.ktm.asiala.raceon3
 import android.Manifest
 import android.app.AlertDialog
 import android.bluetooth.*
+import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -10,11 +14,8 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import kotlinx.android.synthetic.main.activity_main.*
-import org.altbeacon.beacon.Beacon
-import org.altbeacon.beacon.BeaconManager
 import org.altbeacon.beaconreference.R
 
 
@@ -26,24 +27,40 @@ class MainActivity : AppCompatActivity() {
     lateinit var disconnectButton: Button
     var alertDialog: AlertDialog? = null
 
-    //BLE variables
-    lateinit var beaconReferenceApplication: BeaconReferenceApplication
-    lateinit var mBluetoothGatt: BluetoothGatt
+    //BLE Variables
+    lateinit var mBluetoothAdapter: BluetoothAdapter
+    lateinit var mBluetoothLeScanner: BluetoothLeScanner
+    lateinit var mBluetoothManager: BluetoothManager
+
+    var alreadyFound: Boolean = false
+
+    private val mLeScanCallback: ScanCallback = object : ScanCallback() {
+        @RequiresApi(Build.VERSION_CODES.Q)
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            //super.onScanResult(callbackType, result);
+            Log.i("BLE", result.getDevice().address)
+
+            if(alreadyFound == false){
+                alreadyFound = true
+                connectWithMotorcycle(result.device.address)
+            }
 
 
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            super.onScanFailed(errorCode)
+            Log.i("BLE", "error")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        beaconReferenceApplication = application as BeaconReferenceApplication
 
-        // Set up a Live Data observer for beacon data
-        val regionViewModel = BeaconManager.getInstanceForApplication(this)
-            .getRegionViewModel(beaconReferenceApplication.region)
-        // observer will be called each time the monitored regionState changes (inside vs. outside region)
-        regionViewModel.regionState.observe(this, monitoringObserver)
-        // observer will be called each time a new list of beacons is ranged (typically ~1 second in the foreground)
-        regionViewModel.rangedBeacons.observe(this, rangingObserver)
+        this.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        this.mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+
 
         //Link views with variables
         updateButton = findViewById<Button>(R.id.updateButton)
@@ -51,6 +68,8 @@ class MainActivity : AppCompatActivity() {
         beaconStateTextView = findViewById<TextView>(R.id.beaconState)
         beaconCountTextView = findViewById<TextView>(R.id.beaconInformation)
         beaconCountTextView.text = "Searching..."
+
+
     }
 
     override fun onPause() {
@@ -68,49 +87,49 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    //Not used right now
-    val monitoringObserver = Observer<Int> { state ->
-        /*var dialogTitle = "Beacons detected"
-        var dialogMessage = "didEnterRegionEvent has fired"
-        var stateString = "inside"
-        if (state == MonitorNotifier.OUTSIDE) {
-            dialogTitle = "No beacons detected"
-            dialogMessage = "didExitRegionEvent has fired"
-            stateString == "outside"
-            beaconCountTextView.text = "Outside of the beacon region -- no beacons detected"
-            beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf("--"))
-        }
-        else {
-            beaconCountTextView.text = "Inside the beacon region."
-        }
-        Log.d(TAG, "monitoring state changed to : $stateString")
-        val builder =
-            AlertDialog.Builder(this)
-        builder.setTitle(dialogTitle)
-        builder.setMessage(dialogMessage)
-        builder.setPositiveButton(android.R.string.ok, null)
-        alertDialog?.dismiss()
-        alertDialog = builder.create()
-        alertDialog?.show()*/
+    fun startScanning(){
+        mBluetoothLeScanner.startScan(mLeScanCallback);
     }
 
-    //Check if the right beacon is found
-    val rangingObserver = Observer<Collection<Beacon>> { beacons ->
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun connectWithMotorcycle(macAdress: String) {
+        mBluetoothLeScanner.stopScan(mLeScanCallback)
+
+        mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
+        val mBluetoothAdapter = mBluetoothManager.getAdapter();
+        val device: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(macAdress)
+
+        device.connectGatt(this, false, mGattCallback);
+    }
+
+    private val mGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
+        @RequiresApi(Build.VERSION_CODES.Q)
+        override fun onConnectionStateChange(
+            gatt: BluetoothGatt,
+            status: Int,
+            newState: Int
+        ) {
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+
+                val mBluetoothSocket : BluetoothSocket = gatt.device.createL2capChannel(0x0080)
+                Log.d(BeaconReferenceApplication.TAG, mBluetoothSocket.isConnected.toString())
+                mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
+            }
+        }
 
     }
+
 
     fun updateButtonClicked(view: View) {
-        beaconStateTextView.setText(beaconReferenceApplication.beaconState)
-        beaconInformation.setText(beaconReferenceApplication.beaconInformation)
-        keyTextView.setText(beaconReferenceApplication.key)
+        startScanning()
     }
 
     fun disconnectButtonClicked(view: View) {
-        beaconReferenceApplication.disconnectGatt()
+        //beaconReferenceApplication.disconnectGatt()
     }
 
     fun getKeyButtonClicked(view: View){
-        beaconReferenceApplication.readCharacteristic()
+        //beaconReferenceApplication.readCharacteristic()
     }
 
 
