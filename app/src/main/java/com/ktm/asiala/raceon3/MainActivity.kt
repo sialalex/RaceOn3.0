@@ -37,15 +37,13 @@ class MainActivity : AppCompatActivity() {
     private val mLeScanCallback: ScanCallback = object : ScanCallback() {
         @RequiresApi(Build.VERSION_CODES.Q)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            //super.onScanResult(callbackType, result);
+            super.onScanResult(callbackType, result);
             Log.i("BLE", result.getDevice().address)
 
-            if(alreadyFound == false){
-                alreadyFound = true
+            if(result.device.address.equals("B8:27:EB:B0:A7:9F")){
+                mBluetoothLeScanner.stopScan(this)
                 connectWithMotorcycle(result.device.address)
             }
-
-
         }
 
         override fun onScanFailed(errorCode: Int) {
@@ -91,15 +89,16 @@ class MainActivity : AppCompatActivity() {
         mBluetoothLeScanner.startScan(mLeScanCallback);
     }
 
+    fun stopScanning(){
+
+    }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     fun connectWithMotorcycle(macAdress: String) {
         mBluetoothLeScanner.stopScan(mLeScanCallback)
-
         mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
-        val mBluetoothAdapter = mBluetoothManager.getAdapter();
         val device: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(macAdress)
-
-        device.connectGatt(this, false, mGattCallback);
+        device.connectGatt(this, false, mGattCallback)
     }
 
     private val mGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
@@ -110,10 +109,13 @@ class MainActivity : AppCompatActivity() {
             newState: Int
         ) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                mBluetoothAdapter.cancelDiscovery()
+                val mBluetoothSocket : BluetoothSocket = gatt.device.createInsecureL2capChannel(0x0080)
+                mBluetoothSocket.connect()
+                if(mBluetoothSocket.isConnected){
+                    mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
+                }
 
-                val mBluetoothSocket : BluetoothSocket = gatt.device.createL2capChannel(0x0080)
-                Log.d(BeaconReferenceApplication.TAG, mBluetoothSocket.isConnected.toString())
-                mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
             }
         }
 
