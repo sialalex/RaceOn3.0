@@ -194,6 +194,8 @@ class BeaconReferenceApplication : Application() {
         val mBluetoothSocket : BluetoothSocket = device.createL2capChannel(187)
         Log.d(TAG, mBluetoothSocket.isConnected.toString())
 
+        mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
+
     }
 
     private fun sendNotification(title: String, text: String) {
