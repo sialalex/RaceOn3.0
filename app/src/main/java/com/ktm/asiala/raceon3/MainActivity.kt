@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var mBluetoothAdapter: BluetoothAdapter
     lateinit var mBluetoothLeScanner: BluetoothLeScanner
     lateinit var mBluetoothManager: BluetoothManager
+    lateinit var mBluetoothSocket: BluetoothSocket
 
     var alreadyFound: Boolean = false
 
@@ -110,10 +111,11 @@ class MainActivity : AppCompatActivity() {
         ) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mBluetoothAdapter.cancelDiscovery()
-                val mBluetoothSocket : BluetoothSocket = gatt.device.createInsecureL2capChannel(0x0080)
+                mBluetoothSocket = gatt.device.createInsecureL2capChannel(0x0080)
                 mBluetoothSocket.connect()
                 if(mBluetoothSocket.isConnected){
-                    mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
+                    beaconStateTextView.setText("Connected!")
+
                 }
 
             }
@@ -131,7 +133,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getKeyButtonClicked(view: View){
-        //beaconReferenceApplication.readCharacteristic()
+        beaconCountTextView.setText("Sending Data!")
+        mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
     }
 
 
