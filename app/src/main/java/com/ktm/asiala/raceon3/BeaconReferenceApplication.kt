@@ -201,10 +201,8 @@ class BeaconReferenceApplication : Application() {
         @RequiresApi(Build.VERSION_CODES.Q)
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                val device = gatt!!.device
-                val mBluetoothSocket : BluetoothSocket = device.createL2capChannel(0x0080)
+                val mBluetoothSocket : BluetoothSocket = gatt!!.device.createInsecureL2capChannel(0x0080)
                 Log.d(TAG, mBluetoothSocket.isConnected.toString())
-
                 mBluetoothSocket.connect()
                 if(mBluetoothSocket.isConnected == true){
                     beaconState = "Connected!"
