@@ -164,7 +164,7 @@ class BeaconReferenceApplication : Application() {
             //Check if the required beacon is found
             if (beacons.size != 0) {
                 beacons.forEach { beacon ->
-                    if (beacon.bluetoothName.equals("RaceOn")) {
+                    if (beacon.bluetoothName.equals("RaceOn3")) {
                         Log.d(MainActivity.TAG, "Found the right RaceOn Beacon")
 
                         beaconInformation = "Found the motorcycle! " + beacon.bluetoothAddress
@@ -191,10 +191,12 @@ class BeaconReferenceApplication : Application() {
         mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
         val mBluetoothAdapter = mBluetoothManager.getAdapter();
         val device: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(macAdress)
-        val mBluetoothSocket : BluetoothSocket = device.createL2capChannel(187)
+        val mBluetoothSocket : BluetoothSocket = device.createL2capChannel(0x0080)
         Log.d(TAG, mBluetoothSocket.isConnected.toString())
 
-        mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
+        mBluetoothSocket.connect()
+
+        //mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
 
     }
 
