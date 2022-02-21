@@ -19,6 +19,8 @@ class BeaconReferenceApplication : Application() {
     lateinit var region: Region
     lateinit var mBluetoothManager: BluetoothManager
     lateinit var mBluetoothGatt: BluetoothGatt
+    lateinit var mBluetoothAdapter: BluetoothAdapter
+    lateinit var mBluetoothSocket : BluetoothSocket
 
     var beaconState = "Unknown"
     var beaconInformation = "Unknown"
@@ -101,10 +103,9 @@ class BeaconReferenceApplication : Application() {
         regionViewModel.rangedBeacons.observeForever(centralRangingObserver)
     }
 
-    fun disconnectGatt() {
+    fun disconnectRaceOn3() {
         super.onTerminate()
-        raceon3_descriptor.value = BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
-        mBluetoothGatt.writeDescriptor(raceon3_descriptor)
+        mBluetoothSocket.close()
 
         beaconState = "Disconnecting..."
         beaconInformation = "Closing Connection!"
@@ -118,10 +119,19 @@ class BeaconReferenceApplication : Application() {
         notificationManager.cancelAll()
     }
 
-    fun readCharacteristic(){
-        if(mBluetoothGatt != null){
-            mBluetoothGatt.readCharacteristic(raceon3_characteristic)
-        }
+
+    fun getKey(){
+        mBluetoothSocket.outputStream.write("GetKey".toByteArray())
+
+        val buffer = ByteArray(512)
+        val a = mBluetoothSocket.inputStream
+        val bytes = a.read(buffer)
+
+        key = String(buffer, StandardCharsets.UTF_8)
+    }
+
+    fun readData(){
+
     }
 
     fun setupForegroundService() {
@@ -189,26 +199,26 @@ class BeaconReferenceApplication : Application() {
     @RequiresApi(Build.VERSION_CODES.Q)
     fun connectWithMotorcycle(macAdress: String) {
         mBluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
-        val mBluetoothAdapter = mBluetoothManager.getAdapter();
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
         val device: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(macAdress)
         device.connectGatt(this, false, mBluetoothGattCallback)
-
-        //mBluetoothSocket.outputStream.write("187 Strassenbande".toByteArray())
-
     }
 
     private val mBluetoothGattCallback = object : BluetoothGattCallback() {
         @RequiresApi(Build.VERSION_CODES.Q)
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                val mBluetoothSocket : BluetoothSocket = gatt!!.device.createInsecureL2capChannel(0x0080)
-                Log.d(TAG, mBluetoothSocket.isConnected.toString())
+                mBluetoothAdapter.cancelDiscovery()
+                if (gatt != null) {
+                    mBluetoothSocket = gatt.device.createInsecureL2capChannel(0x0080)
+                }
                 mBluetoothSocket.connect()
                 if(mBluetoothSocket.isConnected == true){
+                    Log.d(TAG, mBluetoothSocket.isConnected.toString())
                     beaconState = "Connected!"
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                // disconnected from the GATT Server
+                beaconState = "Disconnected!"
             }
         }
     }

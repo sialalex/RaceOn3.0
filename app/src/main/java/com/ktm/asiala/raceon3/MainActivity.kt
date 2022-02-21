@@ -70,28 +70,6 @@ class MainActivity : AppCompatActivity() {
 
     //Not used right now
     val monitoringObserver = Observer<Int> { state ->
-        /*var dialogTitle = "Beacons detected"
-        var dialogMessage = "didEnterRegionEvent has fired"
-        var stateString = "inside"
-        if (state == MonitorNotifier.OUTSIDE) {
-            dialogTitle = "No beacons detected"
-            dialogMessage = "didExitRegionEvent has fired"
-            stateString == "outside"
-            beaconCountTextView.text = "Outside of the beacon region -- no beacons detected"
-            beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf("--"))
-        }
-        else {
-            beaconCountTextView.text = "Inside the beacon region."
-        }
-        Log.d(TAG, "monitoring state changed to : $stateString")
-        val builder =
-            AlertDialog.Builder(this)
-        builder.setTitle(dialogTitle)
-        builder.setMessage(dialogMessage)
-        builder.setPositiveButton(android.R.string.ok, null)
-        alertDialog?.dismiss()
-        alertDialog = builder.create()
-        alertDialog?.show()*/
     }
 
     //Check if the right beacon is found
@@ -106,11 +84,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun disconnectButtonClicked(view: View) {
-        beaconReferenceApplication.disconnectGatt()
+        beaconReferenceApplication.disconnectRaceOn3()
     }
 
     fun getKeyButtonClicked(view: View){
-        beaconReferenceApplication.readCharacteristic()
+        beaconReferenceApplication.getKey()
+        updateButton.performClick()
+    }
+
+    fun writeDataButtonClicked(view: View){
+
     }
 
 

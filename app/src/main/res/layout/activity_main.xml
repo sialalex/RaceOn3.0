@@ -42,6 +42,13 @@
         </Button>
     </LinearLayout>
     <Button
+        android:id="@+id/writeDataButton"
+        android:text="Write Data"
+        android:onClick="writeDataButtonClicked"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+    </Button>
+    <Button
         android:id="@+id/getKeyButton"
         android:text="Get Key"
         android:onClick="getKeyButtonClicked"
