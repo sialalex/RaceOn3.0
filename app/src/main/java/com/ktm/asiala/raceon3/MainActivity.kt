@@ -24,11 +24,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var beaconCountTextView: TextView
     lateinit var updateButton: Button
     lateinit var disconnectButton: Button
-    var alertDialog: AlertDialog? = null
 
     //BLE variables
     lateinit var beaconReferenceApplication: BeaconReferenceApplication
-    lateinit var mBluetoothGatt: BluetoothGatt
 
 
 
@@ -81,6 +79,8 @@ class MainActivity : AppCompatActivity() {
         beaconStateTextView.setText(beaconReferenceApplication.beaconState)
         beaconInformation.setText(beaconReferenceApplication.beaconInformation)
         keyTextView.setText(beaconReferenceApplication.key)
+        dataTextView.setText(beaconReferenceApplication.data)
+
     }
 
     fun disconnectButtonClicked(view: View) {
@@ -92,8 +92,9 @@ class MainActivity : AppCompatActivity() {
         updateButton.performClick()
     }
 
-    fun writeDataButtonClicked(view: View){
-
+    fun getDataButtonClicked(view: View){
+        beaconReferenceApplication.getData()
+        updateButton.performClick()
     }
 
 

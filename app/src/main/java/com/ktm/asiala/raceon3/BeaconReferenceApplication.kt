@@ -25,9 +25,7 @@ class BeaconReferenceApplication : Application() {
     var beaconState = "Unknown"
     var beaconInformation = "Unknown"
     var key = "NO KEY"
-
-    lateinit var raceon3_characteristic: BluetoothGattCharacteristic
-    lateinit var raceon3_descriptor: BluetoothGattDescriptor
+    var data: String = "NO DATA"
 
     override fun onCreate() {
         super.onCreate()
@@ -123,11 +121,30 @@ class BeaconReferenceApplication : Application() {
     fun getKey(){
         mBluetoothSocket.outputStream.write("GetKey".toByteArray())
 
-        val buffer = ByteArray(512)
+        val buffer = ByteArray(1024) //1 MB
         val a = mBluetoothSocket.inputStream
         val bytes = a.read(buffer)
 
         key = String(buffer, StandardCharsets.UTF_8)
+    }
+
+    fun getData(){
+        mBluetoothSocket.outputStream.write("GetData".toByteArray())
+
+        val buffer = ByteArray(70000)
+        val buffer2 = ByteArray(70000)
+        val a = mBluetoothSocket.inputStream
+        val bytes = a.read(buffer)
+        val bytes2 = a.read(buffer2)
+
+        val data1 = String(buffer, StandardCharsets.UTF_8)
+        Log.d(TAG, data1)
+        val data2 = String(buffer2, StandardCharsets.UTF_8)
+        Log.d(TAG, data2)
+
+        val sb = StringBuilder()
+        sb.append(data1.substring(0, 20) + "...").append("\r\n").append(data2.substring(0, 20) + "...")
+        data = sb.toString()
     }
 
     fun readData(){

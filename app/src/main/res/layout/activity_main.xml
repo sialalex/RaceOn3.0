@@ -43,8 +43,8 @@
     </LinearLayout>
     <Button
         android:id="@+id/writeDataButton"
-        android:text="Write Data"
-        android:onClick="writeDataButtonClicked"
+        android:text="Get Data"
+        android:onClick="getDataButtonClicked"
         android:layout_width="match_parent"
         android:layout_height="50dp">
     </Button>
@@ -62,5 +62,11 @@
         android:text="NO KEY"
         android:textAlignment="center"
         />
-
+    <TextView
+        android:id="@+id/dataTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="NO Data"
+        android:textAlignment="center"
+        />
 </LinearLayout>
