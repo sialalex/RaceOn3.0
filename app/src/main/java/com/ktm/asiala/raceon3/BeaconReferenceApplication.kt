@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import org.altbeacon.beacon.*
 import org.altbeacon.beaconreference.R
+import java.io.BufferedReader
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -128,7 +129,7 @@ class BeaconReferenceApplication : Application() {
         key = String(buffer, StandardCharsets.UTF_8)
     }
 
-    fun getData(){
+    /*fun getData(){
         mBluetoothSocket.outputStream.write("GetData".toByteArray())
 
         val buffer = ByteArray(70000)
@@ -145,6 +146,30 @@ class BeaconReferenceApplication : Application() {
         val sb = StringBuilder()
         sb.append(data1.substring(0, 20) + "...").append("\r\n").append(data2.substring(0, 20) + "...")
         data = sb.toString()
+    }*/
+
+    fun getData(){
+        mBluetoothSocket.outputStream.write("GetData".toByteArray())
+
+        val inputStream = mBluetoothSocket.inputStream
+        val reader = BufferedReader(inputStream.reader())
+        val content = StringBuilder()
+        try {
+            var line = reader.readLine()
+            while (line != null) {
+                content.append(line)
+                line = reader.readLine()
+                Log.d(TAG, line)
+
+                if(line == "----END----"){
+                    Log.d(TAG, "Found end")
+                    reader.close()
+                    return
+                }
+            }
+        } finally {
+            reader.close()
+        }
     }
 
     fun readData(){
