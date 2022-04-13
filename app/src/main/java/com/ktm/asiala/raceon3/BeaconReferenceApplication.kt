@@ -163,6 +163,7 @@ class BeaconReferenceApplication : Application() {
 
                 if(line == "----END----"){
                     Log.d(TAG, "Found end")
+                    data = "Received Data!"
                     reader.close()
                     return
                 }
