@@ -165,17 +165,12 @@ class BeaconReferenceApplication : Application() {
                     Log.d(TAG, "Found end")
                     data = "Received Data!"
                     data = data.plus("\r\n" + content.toString().take(25) + "...")
-                    reader.close()
                     return
                 }
             }
         } finally {
-            reader.close()
+            //reader.close()
         }
-    }
-
-    fun readData(){
-
     }
 
     fun setupForegroundService() {
